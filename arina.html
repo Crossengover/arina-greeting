@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Для Арины 💖</title>
+    <style>
+      body {
+        margin: 0;
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background: linear-gradient(135deg, #29204b, #f7e8ff);
+        overflow: hidden;
+        font-family: "Georgia", serif;
+      }
+
+      .content {
+        text-align: center;
+        background: rgba(255, 255, 255, 0.7);
+        padding: 30px;
+        border-radius: 20px;
+        box-shadow: 0 0 30px rgba(255, 182, 193, 0.5);
+        z-index: 2;
+        position: relative;
+        max-width: 640px;
+        width: 90%;
+        backdrop-filter: blur(6px);
+        animation: fadeIn 2s ease;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: scale(0.95);
+        }
+        to {
+          opacity: 1;
+          transform: scale(1);
+        }
+      }
+
+      h1 {
+        font-size: 2em;
+        color: #d63384;
+        margin-bottom: 15px;
+        font-family: "Playfair Display", serif;
+      }
+
+      .poem {
+        font-size: 1.2em;
+        color: #444;
+        line-height: 1.6;
+        min-height: 160px;
+        font-style: italic;
+        word-wrap: break-word;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .poem p {
+        opacity: 0;
+        transform: translateY(10px);
+        transition: all 1s ease;
+        margin: 4px 0;
+      }
+
+      .poem p.show {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      /* ✨ плавное перелистывание */
+      .slide-out {
+        animation: slideOut 0.6s forwards ease;
+      }
+
+      .slide-in {
+        animation: slideIn 0.6s forwards ease;
+      }
+
+      @keyframes slideOut {
+        from {
+          opacity: 1;
+          transform: translateX(0);
+        }
+        to {
+          opacity: 0;
+          transform: translateX(-50px);
+        }
+      }
+
+      @keyframes slideIn {
+        from {
+          opacity: 0;
+          transform: translateX(50px);
+        }
+        to {
+          opacity: 1;
+          transform: translateX(0);
+        }
+      }
+
+      .controls {
+        margin-top: 20px;
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+
+      button {
+        background: #ffb6c1;
+        color: white;
+        border: none;
+        padding: 10px 16px;
+        border-radius: 20px;
+        cursor: pointer;
+        font-size: 1em;
+        transition: 0.3s;
+      }
+
+      button:hover {
+        background: #e06a8d;
+      }
+
+      /* Луна */
+      .moon {
+        position: absolute;
+        top: 40px;
+        right: 40px;
+        width: 100px;
+        height: 100px;
+        background: radial-gradient(circle, #fffce8, #f8e4b7);
+        border-radius: 50%;
+        box-shadow: 0 0 60px rgba(255, 248, 200, 0.9);
+        z-index: 1;
+        animation: pulse 4s infinite ease-in-out;
+      }
+
+      @keyframes pulse {
+        0%,
+        100% {
+          box-shadow: 0 0 40px rgba(255, 248, 200, 0.7);
+        }
+        50% {
+          box-shadow: 0 0 70px rgba(255, 248, 200, 1);
+        }
+      }
+
+      /* Звёзды */
+      .star {
+        position: absolute;
+        width: 2px;
+        height: 2px;
+        background: white;
+        border-radius: 50%;
+        opacity: 0.8;
+        animation: twinkle 4s infinite ease-in-out;
+      }
+
+      @keyframes twinkle {
+        0%,
+        100% {
+          opacity: 0.2;
+        }
+        50% {
+          opacity: 1;
+        }
+      }
+
+      /* Canvas для конфетти */
+      #confetti {
+        position: fixed;
+        top: 0;
+        left: 0;
+        pointer-events: none;
+        z-index: 3;
+      }
+
+      /* 📱 Адаптив */
+      @media (max-width: 600px) {
+        h1 {
+          font-size: 1.6em;
+        }
+        .poem {
+          font-size: 1em;
+          min-height: 120px;
+        }
+        .moon {
+          width: 70px;
+          height: 70px;
+          top: 20px;
+          right: 20px;
+        }
+        button {
+          padding: 8px 12px;
+          font-size: 0.9em;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="moon"></div>
+    <div class="content">
+      <h1>Для Арины</h1>
+      <div id="poem" class="poem"></div>
+      <div class="controls">
+        <button id="prev">←</button>
+        <button id="next">→</button>
+        <button id="music">🎵 Play</button>
+      </div>
+    </div>
+
+    <canvas id="confetti"></canvas>
+
+    <script>
+      // ---- СТИХИ ----
+      const poems = [
+        `Один лишь месяц — а как много,\nВ душе открылось добрых чувств.\nС тобой и радостно, и строго,\nТы даришь свет, тепло и вкус.\n\nСпасибо за минуты счастья,\nЗа разговоры до зари.\nТы стала ближе, чем казалась,\nБлагодарю тебя, Арин!`,
+
+        `Я не могу понять, что в сердце стало,\n
+Когда с тобой я говорю всерьёз.\n
+Как будто света мне внезапно мало,\n
+И греет память о тепле из грёз.\n\n
+
+Пусть ночь укроет сном спокойным,\n
+И звёзды шепчут о любви.\n
+Пусть утро будет добрым, солнечным,\n
+Чтоб счастье встретилось в пути.`,
+        `Пусть ночь укроет тишиной,\n
+И сны подарят мир красивый,\n
+Пускай там пахнет, как Deli‌na,\n
+Напоминая дом родной.\n\n
+
+Ни грусти светлой, ни тоски,\n
+Одна лишь радость и улыбки,\n
+Пусть сон волшебный до зари\n
+Тебя хранит в объятьях зыбких.`,
+
+        `Арина — прекрасное имя\n
+В нём нежность и свет чистоты.\n
+Оно для меня, словно пламя,\n
+Что греет в холодной тиши.\n
+
+Звучит оно мягко и звонко,\n
+Как песня, рождённая в снах.\n
+В нём радость, надежда и тонкость,\n
+И нежность в любимых словах.\n
+
+Не слышал сегодня я голос,\n
+И стало чуть тише внутри.\n
+Пусть ночь принесёт его снова —\n
+Во сне мне, как эхо, звенит.\n`,
+      ];
+
+      let current = 0;
+      const poemEl = document.getElementById("poem");
+
+      function showPoem(i, direction = "next") {
+        // эффект ухода
+        if (poemEl.children.length) {
+          poemEl.classList.add("slide-out");
+          setTimeout(() => {
+            poemEl.classList.remove("slide-out");
+            renderPoem(i);
+            poemEl.classList.add("slide-in");
+            setTimeout(() => poemEl.classList.remove("slide-in"), 600);
+          }, 600);
+        } else {
+          renderPoem(i);
+        }
+      }
+
+      function renderPoem(i) {
+        poemEl.innerHTML = "";
+        const lines = poems[i].split("\n");
+        lines.forEach((line, idx) => {
+          const p = document.createElement("p");
+          p.textContent = line;
+          poemEl.appendChild(p);
+          setTimeout(() => p.classList.add("show"), 400 * idx);
+        });
+      }
+
+      showPoem(current);
+
+      document.getElementById("prev").onclick = () => {
+        current = (current - 1 + poems.length) % poems.length;
+        showPoem(current, "prev");
+      };
+      document.getElementById("next").onclick = () => {
+        current = (current + 1) % poems.length;
+        showPoem(current, "next");
+      };
+
+      // ---- МУЗЫКА ----
+      const audio = new Audio("music.mp3");
+      let playing = false;
+      const musicBtn = document.getElementById("music");
+      musicBtn.onclick = () => {
+        if (!playing) {
+          audio.play();
+          musicBtn.textContent = "⏸ Pause";
+        } else {
+          audio.pause();
+          musicBtn.textContent = "🎵 Play";
+        }
+        playing = !playing;
+      };
+
+      // ---- КОНФЕТТИ ----
+      const confettiCanvas = document.getElementById("confetti");
+      const ctx = confettiCanvas.getContext("2d");
+      confettiCanvas.width = window.innerWidth;
+      confettiCanvas.height = window.innerHeight;
+
+      const confettiPieces = [];
+      for (let i = 0; i < 200; i++) {
+        confettiPieces.push({
+          x: Math.random() * confettiCanvas.width,
+          y: Math.random() * confettiCanvas.height,
+          r: Math.random() * 6 + 2,
+          d: Math.random() * 300,
+          color: `hsl(${Math.random() * 360}, 100%, 70%)`,
+          tilt: Math.random() * 10 - 10,
+        });
+      }
+
+      function drawConfetti() {
+        ctx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+        confettiPieces.forEach((p) => {
+          ctx.beginPath();
+          ctx.fillStyle = p.color;
+          ctx.fillRect(p.x, p.y, p.r, p.r);
+          ctx.closePath();
+        });
+        updateConfetti();
+      }
+
+      function updateConfetti() {
+        confettiPieces.forEach((p) => {
+          p.y += Math.cos(p.d) + 1 + p.r / 2;
+          p.x += Math.sin(p.d);
+          if (p.y > confettiCanvas.height) {
+            p.y = 0;
+            p.x = Math.random() * confettiCanvas.width;
+          }
+        });
+      }
+
+      function animateConfetti() {
+        drawConfetti();
+        requestAnimationFrame(animateConfetti);
+      }
+      animateConfetti();
+
+      // ---- ЗВЁЗДЫ ----
+      for (let i = 0; i < 100; i++) {
+        let star = document.createElement("div");
+        star.className = "star";
+        star.style.top = Math.random() * window.innerHeight + "px";
+        star.style.left = Math.random() * window.innerWidth + "px";
+        star.style.animationDuration = 3 + Math.random() * 4 + "s";
+        document.body.appendChild(star);
+      }
+
+      // 📱 Перерисовать canvas при изменении размера
+      window.addEventListener("resize", () => {
+        confettiCanvas.width = window.innerWidth;
+        confettiCanvas.height = window.innerHeight;
+      });
+    </script>
+  </body>
+</html>
