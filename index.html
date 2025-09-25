@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Для Арины </title>
+    <title>Для Арины</title>
     <style>
       body {
         margin: 0;
@@ -14,6 +14,7 @@
         background: linear-gradient(135deg, #29204b, #f7e8ff);
         overflow: hidden;
         font-family: "Georgia", serif;
+        transition: background 2s ease;
       }
 
       .content {
@@ -46,6 +47,7 @@
         color: #d63384;
         margin-bottom: 15px;
         font-family: "Playfair Display", serif;
+        cursor: pointer;
       }
 
       .poem {
@@ -136,6 +138,7 @@
         box-shadow: 0 0 60px rgba(255, 248, 200, 0.9);
         z-index: 1;
         animation: pulse 4s infinite ease-in-out;
+        cursor: pointer;
       }
 
       @keyframes pulse {
@@ -216,7 +219,7 @@
   <body>
     <div class="moon"></div>
     <div class="content">
-      <h1>Для Арины</h1>
+      <h1 id="title">Для Арины</h1>
       <div id="poem" class="poem"></div>
       <div class="controls">
         <button id="prev">←</button>
@@ -229,19 +232,19 @@
     <script>
       // ---- СТИХИ ----
       const poems = [
-        `Один лишь месяц — а как много,\nВ душе открылось добрых чувств.\nС тобой и радостно, и строго,\nТы даришь свет, тепло и вкус.\n\nСпасибо за минуты счастья,\nЗа разговоры до зари.\nТы стала ближе, чем казалась,\nБлагодарю тебя, Арин!`,
+        `Один лишь месяц — а как много,\nВ душе открылось добрых чувств.\nС тобой и радостно, и строго,\nТы даришь свет, тепло и вкус.\n\nСпасибо за минуты счастья,\nЗа разговоры до зари.\nТы стала ближе, чем казалось,\nБлагодарю тебя, Арин!`,
 
         `Я не могу понять, что в сердце стало,\nКогда с тобой я говорю всерьёз.\nКак будто света мне внезапно мало,\nИ греет память о тепле из грёз.\n\nПусть ночь укроет сном спокойным,\nИ звёзды шепчут о любви.\nПусть утро будет добрым, солнечным,\nЧтоб счастье встретилось в пути.`,
 
         `Пусть ночь укроет тишиной,\nИ сны подарят мир красивый,\nПускай там пахнет, как Deli‌na,\nНапоминая дом родной.\n\nНи грусти светлой, ни тоски,\nОдна лишь радость и улыбки,\nПусть сон волшебный до зари\nТебя хранит в объятьях зыбких.`,
 
-        `Арина — прекрасное имя\nВ нём нежность и свет чистоты.\nОно для меня, словно пламя,\nЧто греет в холодной тиши.\n\nЗвучит оно мягко и звонко,\nКак песня, рождённая в снах.\nВ нём радость, надежда и тонкость,\nИ нежность в любимых словах.\n\nНе слышал сегодня я голос,\nИ стало чуть тише внутри.\nПусть ночь принесёт его снова —\nВо сне мне, как эхо, звенит.`
+        `Арина — прекрасное имя\nВ нём нежность и свет чистоты.\nОно для меня, словно пламя,\nЧто греет в холодной тиши.\n\nЗвучит оно мягко и звонко,\nКак песня, рождённая в снах.\nВ нём радость, надежда и тонкость,\nИ нежность в любимых словах.\n\nНе слышал сегодня я голос,\nИ стало чуть тише внутри.\nПусть ночь принесёт его снова —\nВо сне мне, как эхо, звенит.`,
       ];
 
       let current = 0;
       const poemEl = document.getElementById("poem");
 
-      function showPoem(i, direction = "next") {
+      function showPoem(i) {
         if (poemEl.children.length) {
           poemEl.classList.add("slide-out");
           setTimeout(() => {
@@ -270,11 +273,11 @@
 
       document.getElementById("prev").onclick = () => {
         current = (current - 1 + poems.length) % poems.length;
-        showPoem(current, "prev");
+        showPoem(current);
       };
       document.getElementById("next").onclick = () => {
         current = (current + 1) % poems.length;
-        showPoem(current, "next");
+        showPoem(current);
       };
 
       // ---- МУЗЫКА ----
@@ -331,13 +334,96 @@
 
       shootingBtn.onclick = createFallingStar;
 
-      // автоматические падающие звёзды 🌠
       function randomFallingStars() {
         createFallingStar();
-        let nextTime = 1000 + Math.random() * 1000; // 1–2 секунды
+        let nextTime = 1000 + Math.random() * 1000;
         setTimeout(randomFallingStars, nextTime);
       }
       setTimeout(randomFallingStars, 1500);
+
+      // 🎁 Пасхалка 1: тряска iPhone → конфетти
+      if (window.DeviceMotionEvent) {
+        let lastX, lastY, lastZ;
+        window.addEventListener("devicemotion", (e) => {
+          let acc = e.accelerationIncludingGravity;
+          if (!acc.x) return;
+          let deltaX = Math.abs(acc.x - (lastX || 0));
+          let deltaY = Math.abs(acc.y - (lastY || 0));
+          let deltaZ = Math.abs(acc.z - (lastZ || 0));
+          if (deltaX + deltaY + deltaZ > 30) {
+            launchConfetti();
+          }
+          lastX = acc.x;
+          lastY = acc.y;
+          lastZ = acc.z;
+        });
+      }
+
+      function launchConfetti() {
+        for (let i = 0; i < 50; i++) {
+          let conf = document.createElement("div");
+          conf.style.position = "absolute";
+          conf.style.top = "0px";
+          conf.style.left = Math.random() * window.innerWidth + "px";
+          conf.style.width = "8px";
+          conf.style.height = "8px";
+          conf.style.background = `hsl(${Math.random() * 360},100%,70%)`;
+          conf.style.borderRadius = "50%";
+          conf.style.opacity = "0.9";
+          conf.style.transform = `rotate(${Math.random() * 360}deg)`;
+          conf.style.transition =
+            "transform 2s ease, top 2s ease, opacity 2s ease";
+          document.body.appendChild(conf);
+          setTimeout(() => {
+            conf.style.top = window.innerHeight + "px";
+            conf.style.transform += " scale(0.5)";
+            conf.style.opacity = "0";
+          }, 50);
+          setTimeout(() => conf.remove(), 2500);
+        }
+      }
+
+      // 🎁 Пасхалка 2: клик по луне
+      document.querySelector(".moon").onclick = () => {
+        alert("Это было очевидно! Ищи дальше");
+      };
+
+      // 🎁 Пасхалка 3: тройной клик по заголовку
+      let clicks = 0;
+      const title = document.getElementById("title");
+      title.addEventListener("click", () => {
+        clicks++;
+        if (clicks === 3) {
+          alert("🐱 Мяу!");
+          clicks = 0;
+        }
+        setTimeout(() => (clicks = 0), 1000);
+      });
+
+      // 🎁 Пасхалка 4: долгое удержание кнопки музыки → secret.mp3
+      let holdTimer;
+      musicBtn.addEventListener("mousedown", () => {
+        holdTimer = setTimeout(() => {
+          audio.src = "secret.mp3";
+          audio.play();
+          alert("Секретная песня");
+        }, 2000);
+      });
+      musicBtn.addEventListener("mouseup", () => clearTimeout(holdTimer));
+
+      // 🎁 Пасхалка 5: свайп вверх → смена фона
+      let startY;
+      document.addEventListener("touchstart", (e) => {
+        startY = e.touches[0].clientY;
+      });
+      document.addEventListener("touchend", (e) => {
+        let endY = e.changedTouches[0].clientY;
+        if (startY - endY > 100) {
+          document.body.style.background =
+            "linear-gradient(135deg, #ff9a9e, #fad0c4)";
+          alert("Сменим сумерки на розовый день)");
+        }
+      });
     </script>
   </body>
 </html>
