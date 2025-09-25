@@ -320,8 +320,9 @@
         document.body.appendChild(star);
       }
 
-      // ---- ПАДАЮЩИЕ ЗВЁЗДЫ ----
+     // ---- ПАДАЮЩИЕ ЗВЁЗДЫ + пасхалка 7 кликов ----
       const shootingBtn = document.getElementById("shooting");
+      let starClicks = 0;
 
       function createFallingStar() {
         let fs = document.createElement("div");
@@ -332,13 +333,17 @@
         setTimeout(() => fs.remove(), 2000);
       }
 
-      shootingBtn.onclick = createFallingStar;
-
-      function randomFallingStars() {
+      shootingBtn.onclick = () => {
         createFallingStar();
-        let nextTime = 1000 + Math.random() * 1000;
-        setTimeout(randomFallingStars, nextTime);
-      }
+        starClicks++;
+        if (starClicks === 7) {
+          audio.pause();
+          audio.src = "secret.mp3";
+          audio.volume = 1;
+          audio.play();
+          alert("🌠 Ты нашла секретную мелодию, Арина!");
+          starClicks = 0;
+        }
       setTimeout(randomFallingStars, 1500);
 
       // 🎁 Пасхалка 1: тряска iPhone → конфетти
